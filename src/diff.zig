@@ -47,12 +47,10 @@ fn diffCommonPrefix(text1: []const u8, text2: []const u8) usize {
     var min: usize = 0;
     var max: usize = std.math.min(text1.len, text2.len);
     var mid: usize = max;
-    var start: usize = 0;
 
     while (min < mid) {
-        if (std.mem.eql(u8, text1[start..mid], text2[start..mid])) {
+        if (std.mem.eql(u8, text1[min..mid], text2[min..mid])) {
             min = mid;
-            start = min;
         } else {
             max = mid;
         }
@@ -65,6 +63,8 @@ fn diffCommonPrefix(text1: []const u8, text2: []const u8) usize {
 
 test "diffCommonPrefix" {
     try expectEqual(diffCommonPrefix("", "foo"), 0);
+    try expectEqual(diffCommonPrefix(" foo", "foo"), 0);
     try expectEqual(diffCommonPrefix("foo", "foo"), 3);
     try expectEqual(diffCommonPrefix("asdf asdf", "asdf "), 5);
+    try expectEqual(diffCommonPrefix("あいうえお", "あいうえ"), 12);
 }
