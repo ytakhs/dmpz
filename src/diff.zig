@@ -68,3 +68,32 @@ test "diffCommonPrefix" {
     try expectEqual(diffCommonPrefix("asdf asdf", "asdf "), 5);
     try expectEqual(diffCommonPrefix("あいうえお", "あいうえ"), 12);
 }
+
+fn diffCommonSuffix(text1: []const u8, text2: []const u8) usize {
+    if (std.mem.eql(u8, text1, "") or std.mem.eql(u8, text2, "")) {
+        return 0;
+    }
+
+    var min: usize = 0;
+    var max: usize = std.math.min(text1.len, text2.len);
+    var mid: usize = max;
+
+    while (min < mid) {
+        if (std.mem.eql(u8, text1[text1.len - mid .. text1.len - min], text2[text2.len - mid .. text2.len - min])) {
+            min = mid;
+        } else {
+            max = mid;
+        }
+
+        mid = @divFloor((max - min), 2) + min;
+    }
+
+    return mid;
+}
+
+test "diffCommonSuffix" {
+    try expectEqual(diffCommonSuffix(" foobar", "bar"), 3);
+    try expectEqual(diffCommonSuffix("bar", "baz"), 0);
+    try expectEqual(diffCommonSuffix("", "bar"), 0);
+    try expectEqual(diffCommonSuffix("asdf asdf", " asdf"), 5);
+}
