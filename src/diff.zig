@@ -63,7 +63,7 @@ test "diffMain" {
 }
 
 fn diffCommonPrefix(text1: []const u8, text2: []const u8) usize {
-    if (std.mem.eql(u8, text1, "") or std.mem.eql(u8, text2, "")) {
+    if (text1.len == 0 or text2.len == 0) {
         return 0;
     }
 
@@ -93,7 +93,7 @@ test "diffCommonPrefix" {
 }
 
 fn diffCommonSuffix(text1: []const u8, text2: []const u8) usize {
-    if (std.mem.eql(u8, text1, "") or std.mem.eql(u8, text2, "")) {
+    if (text1.len == 0 or text2.len == 0) {
         return 0;
     }
 
