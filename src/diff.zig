@@ -18,15 +18,38 @@ pub fn diffMain(
     text1: []const u8,
     text2: []const u8,
 ) !DiffList {
-    var dl = DiffList.init(allocator);
-
     if (std.mem.eql(u8, text1, text2)) {
-        try dl.append(.{ .op = Diff.Operation.Equal, .text = text1 });
+        var diffs = DiffList.init(allocator);
+        try diffs.append(.{ .op = Diff.Operation.Equal, .text = text1 });
 
-        return dl;
+        return diffs;
     }
 
-    return dl;
+    var t1 = text1;
+    var t2 = text2;
+
+    var common_length: usize = 0;
+    common_length = diffCommonPrefix(t1, t2);
+    const common_prefix = text1[0..common_length];
+    t1 = t1[common_length..];
+    t2 = t2[common_length..];
+
+    common_length = diffCommonSuffix(t1, t2);
+    const common_suffix = t1[(t1.len - common_length)..];
+    t1 = t1[0..(t1.len - common_length)];
+    t2 = t2[0..(t2.len - common_length)];
+
+    var diffs = try diffCompute(allocator, t1, t2);
+
+    if (common_prefix.len != 0) {
+        try diffs.insert(0, Diff{ .op = Diff.Operation.Insert, .text = common_prefix });
+    }
+
+    if (common_suffix.len != 0) {
+        try diffs.append(Diff{ .op = Diff.Operation.Insert, .text = common_suffix });
+    }
+
+    return diffs;
 }
 
 const testing = std.testing;
@@ -96,4 +119,20 @@ test "diffCommonSuffix" {
     try expectEqual(diffCommonSuffix("bar", "baz"), 0);
     try expectEqual(diffCommonSuffix("", "bar"), 0);
     try expectEqual(diffCommonSuffix("asdf asdf", " asdf"), 5);
+}
+
+fn diffCompute(allocator: Allocator, text1: []const u8, text2: []const u8) !DiffList {
+    var diffs = DiffList.init(allocator);
+
+    if (text1.len == 0) {
+        try diffs.append(Diff{ .op = Diff.Operation.Insert, .text = text2 });
+        return diffs;
+    }
+
+    if (text2.len == 0) {
+        try diffs.append(Diff{ .op = Diff.Operation.Insert, .text = text1 });
+        return diffs;
+    }
+
+    return diffs;
 }
