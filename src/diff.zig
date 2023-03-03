@@ -59,7 +59,7 @@ test "diffMain" {
     const dl = try diffMain(testing.allocator, "foo", "foo");
     defer dl.deinit();
 
-    try testing.expectEqual(dl.items.len, 1);
+    try testing.expectEqual(@as(usize, 1), dl.items.len);
 }
 
 fn diffCommonPrefix(text1: []const u8, text2: []const u8) usize {
@@ -85,11 +85,11 @@ fn diffCommonPrefix(text1: []const u8, text2: []const u8) usize {
 }
 
 test "diffCommonPrefix" {
-    try expectEqual(diffCommonPrefix("", "foo"), 0);
-    try expectEqual(diffCommonPrefix(" foo", "foo"), 0);
-    try expectEqual(diffCommonPrefix("foo", "foo"), 3);
-    try expectEqual(diffCommonPrefix("asdf asdf", "asdf "), 5);
-    try expectEqual(diffCommonPrefix("あいうえお", "あいうえ"), 12);
+    try testing.expectEqual(@as(usize, 0), diffCommonPrefix("", "foo"));
+    try testing.expectEqual(@as(usize, 0), diffCommonPrefix(" foo", "foo"));
+    try testing.expectEqual(@as(usize, 3), diffCommonPrefix("foo", "foo"));
+    try testing.expectEqual(@as(usize, 5), diffCommonPrefix("asdf asdf", "asdf "));
+    try testing.expectEqual(@as(usize, 12), diffCommonPrefix("あいうえお", "あいうえ"));
 }
 
 fn diffCommonSuffix(text1: []const u8, text2: []const u8) usize {
@@ -115,10 +115,10 @@ fn diffCommonSuffix(text1: []const u8, text2: []const u8) usize {
 }
 
 test "diffCommonSuffix" {
-    try expectEqual(diffCommonSuffix(" foobar", "bar"), 3);
-    try expectEqual(diffCommonSuffix("bar", "baz"), 0);
-    try expectEqual(diffCommonSuffix("", "bar"), 0);
-    try expectEqual(diffCommonSuffix("asdf asdf", " asdf"), 5);
+    try testing.expectEqual(@as(usize, 3), diffCommonSuffix(" foobar", "bar"));
+    try testing.expectEqual(@as(usize, 0), diffCommonSuffix("bar", "baz"));
+    try testing.expectEqual(@as(usize, 0), diffCommonSuffix("", "bar"));
+    try testing.expectEqual(@as(usize, 5), diffCommonSuffix("asdf asdf", " asdf"));
 }
 
 fn diffCompute(allocator: Allocator, text1: []const u8, text2: []const u8) !DiffList {
