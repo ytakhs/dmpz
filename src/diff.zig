@@ -130,9 +130,23 @@ fn diffCompute(allocator: Allocator, text1: []const u8, text2: []const u8) !Diff
     }
 
     if (text2.len == 0) {
-        try diffs.append(Diff{ .op = Diff.Operation.Insert, .text = text1 });
+        try diffs.append(Diff{ .op = Diff.Operation.Delete, .text = text1 });
         return diffs;
     }
 
     return diffs;
+}
+
+test "diffCompute" {
+    const a = try diffCompute(testing.allocator, "", "foo");
+    defer a.deinit();
+    try testing.expectEqual(@as(usize, 1), a.items.len);
+    try testing.expectEqual(Diff.Operation.Insert, a.items[0].op);
+    try testing.expectEqualStrings("foo", a.items[0].text);
+
+    const b = try diffCompute(testing.allocator, "foo", "");
+    defer b.deinit();
+    try testing.expectEqual(@as(usize, 1), b.items.len);
+    try testing.expectEqual(Diff.Operation.Delete, b.items[0].op);
+    try testing.expectEqualStrings("foo", b.items[0].text);
 }
